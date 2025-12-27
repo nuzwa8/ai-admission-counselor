@@ -108,7 +108,43 @@ function aiac_dashboard_page() {
 }
 
 /** 5. Empty Temp Functions for Other Pages */
-function aiac_leads_page() { echo '<div class="wrap"><h1>Leads Manager</h1></div>'; }
+/** Part 7 — Leads Manager Page Template */
+function aiac_leads_page() {
+    ?>
+    <div id="aiac-leads-root" class="aiac-wrap">
+        <header class="aiac-header">
+            <div class="aiac-header-title">
+                <h1>Leads Manager</h1>
+                <p>Track and manage initial student inquiries via AI Counselor.</p>
+            </div>
+            <div class="aiac-header-actions">
+                <button class="aiac-btn aiac-btn-primary" id="aiac-add-lead-btn">+ Add New Lead</button>
+                <button class="aiac-btn aiac-btn-secondary" onclick="window.print()">Print List</button>
+            </div>
+        </header>
+
+        <div class="aiac-card aiac-table-card">
+            <table class="aiac-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Student Name</th>
+                        <th>Phone Number</th>
+                        <th>Interested Course</th>
+                        <th>Language</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="aiac-leads-list">
+                    <tr><td colspan="7" style="text-align:center;">Fetching leads from database...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+}
+// ✅ Syntax verified block end
 function aiac_admissions_page() { echo '<div class="wrap"><h1>Admissions</h1></div>'; }
 function aiac_payments_page() { echo '<div class="wrap"><h1>Payments</h1></div>'; }
 function aiac_settings_page() { echo '<div class="wrap"><h1>Settings</h1></div>'; }
