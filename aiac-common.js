@@ -1,22 +1,31 @@
-/** Part 1 — Dashboard Data Fetching & UI Logic */
+/** * AI Admission Counselor - Common JS
+ * Integrated Dashboard & Leads Management
+ */
 (function($) {
     'use strict';
 
     const AIAC_App = {
+        // 1. Initialization
         init: function() {
-            this.fetchDashboardStats();
+            this.initDashboard();
+            this.initLeadsPage();
             this.initEventListeners();
         },
 
+        // 2. Event Listeners
         initEventListeners: function() {
             // Demo Data Import Trigger
             $(document).on('click', '#aiac-import-demo', this.handleDemoImport.bind(this));
         },
 
-        fetchDashboardStats: function() {
+        // 3. Dashboard Logic
+        initDashboard: function() {
             const $root = $('#aiac-dashboard-root');
             if (!$root.length) return;
+            this.fetchDashboardStats();
+        },
 
+        fetchDashboardStats: function() {
             $.ajax({
                 url: aiacData.ajax_url,
                 type: 'POST',
@@ -24,7 +33,7 @@
                     action: 'aiac_get_dashboard_stats',
                     nonce: aiacData.nonce
                 },
-                success: function(response) {
+                success: (response) => {
                     if (response.success) {
                         const data = response.data;
                         $('#stat-total-leads').text(data.total_leads);
@@ -32,9 +41,8 @@
                         $('#stat-total-revenue').text('$' + data.total_revenue);
                         $('#stat-pending-balance').text('$' + data.pending_balance);
                         
-                        // Render table if data exists
                         if(data.recent_admissions) {
-                            AIAC_App.renderRecentTable(data.recent_admissions);
+                            this.renderRecentTable(data.recent_admissions);
                         }
                     }
                 }
@@ -59,6 +67,61 @@
             $('#aiac-recent-admissions-list').html(html);
         },
 
+        // 4. Leads Page Logic
+        initLeadsPage: function() {
+            const $leadsRoot = $('#aiac-leads-root');
+            if (!$leadsRoot.length) return;
+            this.fetchLeads();
+        },
+
+        fetchLeads: function() {
+            $.ajax({
+                url: aiacData.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'aiac_get_leads',
+                    nonce: aiacData.nonce
+                },
+                success: (response) => {
+                    if (response.success) {
+                        this.renderLeadsTable(response.data);
+                    }
+                }
+            });
+        },
+
+        renderLeadsTable: function(leads) {
+            let html = '';
+            if (leads.length === 0) {
+                html = '<tr><td colspan="7" style="text-align:center;">No leads found.</td></tr>';
+            } else {
+                leads.forEach(lead => {
+                    // Handling both dummy and DB data formats
+                    const name = lead.student_name || lead.name;
+                    const date = lead.created_at || lead.date;
+                    const phone = lead.phone_number || lead.phone;
+                    const course = lead.course_id || lead.course || 'AI Mastery';
+                    const lang = lead.language_detected || lead.lang || 'Urdu';
+                    const status = lead.status || 'New';
+
+                    html += `<tr>
+                        <td>${date}</td>
+                        <td><strong>${name}</strong></td>
+                        <td>${phone}</td>
+                        <td>${course}</td>
+                        <td>${lang}</td>
+                        <td><span class="status-badge status-${status.toLowerCase()}">${status}</span></td>
+                        <td>
+                            <button class="aiac-btn-sm aiac-btn-primary">Connect</button>
+                            <button class="aiac-btn-sm aiac-btn-secondary">Edit</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            $('#aiac-leads-list').html(html);
+        },
+
+        // 5. Utility Functions
         handleDemoImport: function() {
             if (!confirm('Are you sure you want to import demo data?')) return;
             
@@ -73,96 +136,8 @@
         }
     };
 
+    // Run on Document Ready
     $(document).ready(() => AIAC_App.init());
 
 })(jQuery);
-// ✅ Syntax verified block end
-/** Part 2 — Leads Manager Logic */
-// ہم اسے پہلے والے AIAC_App آبجیکٹ کے اندر ہی شامل کر رہے ہیں
-
-// نوٹ: اگر آپ نے پہلے والا مکمل کوڈ 'init' کے ساتھ لکھا ہے، 
-// تو بس ان فنکشنز کو اس کے نیچے پیسٹ کریں (بریکٹ کا خیال رکھتے ہوئے)
-
-AIAC_App.initLeadsPage = function() {
-    const $leadsRoot = $('#aiac-leads-root');
-    if (!$leadsRoot.length) return;
-
-    this.fetchLeads();
-};
-
-AIAC_App.fetchLeads = function() {
-    $.ajax({
-        url: aiacData.ajax_url,
-        type: 'POST',
-        data: {
-            action: 'aiac_get_leads',
-            nonce: aiacData.nonce
-        },
-        success: function(response) {
-            if (response.success) {
-                AIAC_App.renderLeadsTable(response.data);
-            }
-        }
-    });
-};
-
-AIAC_App.renderLeadsTable = function(leads) {
-    let html = '';
-    if (leads.length === 0) {
-        html = '<tr><td colspan="7" style="text-align:center;">No leads found.</td></tr>';
-    } else {
-        leads.forEach(lead => {
-            html += `<tr>
-                <td>${lead.date}</td>
-                <td><strong>${lead.name}</strong></td>
-                <td>${lead.phone}</td>
-                <td>${lead.course}</td>
-                <td>${lead.lang}</td>
-                <td><span class="status-badge status-${lead.status.toLowerCase()}">${lead.status}</span></td>
-                <td>
-                    <button class="aiac-btn-sm aiac-btn-primary">Connect</button>
-                    <button class="aiac-btn-sm aiac-btn-secondary">Edit</button>
-                </td>
-            </tr>`;
-        });
-    }
-    $('#aiac-leads-list').html(html);
-};
-
-// اب 'init' فنکشن کو اپ ڈیٹ کریں تاکہ وہ لیڈز پیج کو بھی پہچانے
-const originalInit = AIAC_App.init;
-AIAC_App.init = function() {
-    originalInit.apply(this);
-    this.initLeadsPage();
-};
-// ✅ Syntax verified block end
-/** Part 2 — Leads Page AJAX Loader */
-$(document).ready(function() {
-    if ($('#aiac-leads-root').length > 0) {
-        fetchLeadsList();
-    }
-
-    function fetchLeadsList() {
-        $.post(aiacData.ajax_url, {
-            action: 'aiac_get_leads',
-            nonce: aiacData.nonce
-        }, function(response) {
-            if (response.success) {
-                let html = '';
-                response.data.forEach(function(lead) {
-                    html += `<tr>
-                        <td>${lead.created_at || lead.date}</td>
-                        <td><strong>${lead.student_name || lead.name}</strong></td>
-                        <td>${lead.phone_number || lead.phone}</td>
-                        <td>${lead.course_id || 'AI Mastery'}</td>
-                        <td>${lead.language_detected || 'Urdu'}</td>
-                        <td><span class="status-badge status-new">${lead.status}</span></td>
-                        <td><button class="aiac-btn-sm aiac-btn-primary">View</button></td>
-                    </tr>`;
-                });
-                $('#aiac-leads-list').html(html);
-            }
-        });
-    }
-});
 // ✅ Syntax verified block end
