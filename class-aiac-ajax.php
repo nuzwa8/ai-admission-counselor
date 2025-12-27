@@ -31,21 +31,32 @@ class AIAC_AJAX {
     /** 2. Get Leads for Leads Manager */
     public function get_leads() {
         check_ajax_referer('aiac_secure_nonce', 'nonce');
+        
+        // پہلے ڈیٹا بیس سے ڈیٹا لانے کی کوشش کریں
+        $db = new AIAC_DB();
+        $leads_from_db = $db->fetch_all_leads();
+
+        // اگر ڈیٹا بیس میں ڈیٹا موجود ہو تو وہ دکھائیں
+        if (!empty($leads_from_db)) {
+            wp_send_json_success($leads_from_db);
+        }
+
+        // اگر ڈیٹا بیس خالی ہے تو یہ ڈیفالٹ ڈیٹا دکھائیں
         $leads = array(
             array(
                 'date' => '2025-12-27',
-                'name' => 'Nuzhat (Lead)',
-                'phone' => '+92 300 1234567',
-                'course' => 'AI Mastery',
-                'lang' => 'Urdu',
+                'student_name' => 'Nuzhat (Lead)',
+                'phone_number' => '+92 300 1234567',
+                'course_id' => 'AI Mastery',
+                'language_detected' => 'Urdu',
                 'status' => 'New'
             ),
             array(
                 'date' => '2025-12-26',
-                'name' => 'Ahmed Khan',
-                'phone' => '+92 321 9876543',
-                'course' => 'Web Development',
-                'lang' => 'English',
+                'student_name' => 'Ahmed Khan',
+                'phone_number' => '+92 321 9876543',
+                'course_id' => 'Web Development',
+                'language_detected' => 'English',
                 'status' => 'Contacted'
             )
         );
