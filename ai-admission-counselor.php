@@ -1,65 +1,66 @@
-<?php
-/*
-Plugin Name: AI Admission Counselor
-Description: A smart AI-based admission guide and finance manager.
-Version: 1.0.0
-Author: Architect Mode
-Text Domain: ai-admission-counselor
-*/
+/** Part 6 — Professional Dashboard Template */
+function aiac_dashboard_page() {
+    ?>
+    <div id="aiac-dashboard-root" class="aiac-wrap">
+        <header class="aiac-header">
+            <div class="aiac-header-title">
+                <h1>AI Admission Dashboard</h1>
+                <p>Overview of leads, admissions, and financial performance.</p>
+            </div>
+            <div class="aiac-header-actions">
+                <button class="aiac-btn aiac-btn-secondary" id="aiac-import-demo">Import Demo Data</button>
+                <button class="aiac-btn aiac-btn-primary" id="aiac-export-excel">Export to Excel</button>
+            </div>
+        </header>
 
-if (!defined('ABSPATH')) exit;
+        <div class="aiac-stats-grid">
+            <div class="aiac-card">
+                <h3>Total Leads</h3>
+                <div class="aiac-stat-value" id="stat-total-leads">0</div>
+                <span class="aiac-stat-label">Initial Inquiries</span>
+            </div>
+            <div class="aiac-card">
+                <h3>Admissions</h3>
+                <div class="aiac-stat-value" id="stat-total-admissions">0</div>
+                <span class="aiac-stat-label">Confirmed Students</span>
+            </div>
+            <div class="aiac-card">
+                <h3>Total Revenue</h3>
+                <div class="aiac-stat-value" id="stat-total-revenue">$0</div>
+                <span class="aiac-stat-label">Collected Fees</span>
+            </div>
+            <div class="aiac-card">
+                <h3>Pending Balance</h3>
+                <div class="aiac-stat-value" id="stat-pending-balance" style="color: #e74c3c;">$0</div>
+                <span class="aiac-stat-label">Next Due: <strong id="next-due-date">N/A</strong></span>
+            </div>
+        </div>
 
-// Define Constants
-define('AIAC_PATH', plugin_dir_path(__FILE__));
-define('AIAC_URL', plugin_dir_url(__FILE__));
-
-// Activation Hook
-require_once AIAC_PATH . 'class-aiac-activator.php';
-register_activation_hook(__FILE__, array('AIAC_Activator', 'activate'));
-
-// Load Core Files
-require_once AIAC_PATH . 'class-aiac-assets.php';
-require_once AIAC_PATH . 'class-aiac-ajax.php';
-require_once AIAC_PATH . 'class-aiac-db.php';
-
-// ✅ Syntax verified block end
-/** Part 5 — Admin Menu Setup */
-
-add_action('admin_menu', 'aiac_create_admin_menu');
-
-function aiac_create_admin_menu() {
-    // Main Menu
-    add_menu_page(
-        'AI Admission Counselor',    // Page Title
-        'AI Counselor',             // Menu Title
-        'manage_options',            // Capability
-        'ai-admission-counselor',    // Menu Slug
-        'aiac_dashboard_page',       // Callback Function
-        'dashicons-welcome-learn-more', // Icon
-        25                           // Position
-    );
-
-    // Submenu: Dashboard (Same as main menu)
-    add_submenu_page('ai-admission-counselor', 'Dashboard', 'Dashboard', 'manage_options', 'ai-admission-counselor', 'aiac_dashboard_page');
-
-    // Submenu: Leads
-    add_submenu_page('ai-admission-counselor', 'Leads Manager', 'Leads', 'manage_options', 'aiac-leads', 'aiac_leads_page');
-
-    // Submenu: Admissions
-    add_submenu_page('ai-admission-counselor', 'Admissions', 'Admissions', 'manage_options', 'aiac-admissions', 'aiac_admissions_page');
-
-    // Submenu: Payments
-    add_submenu_page('ai-admission-counselor', 'Payments', 'Payments', 'manage_options', 'aiac-payments', 'aiac_payments_page');
-
-    // Submenu: Settings
-    add_submenu_page('ai-admission-counselor', 'Settings', 'Settings', 'manage_options', 'aiac-settings', 'aiac_settings_page');
+        <div class="aiac-content-section">
+            <div class="aiac-card aiac-table-card">
+                <div class="card-header">
+                    <h2>Recent Admissions</h2>
+                    <button class="aiac-btn-text" onclick="window.print()">Print Report</button>
+                </div>
+                <table class="aiac-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Course</th>
+                            <th>Status</th>
+                            <th>Balance</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aiac-recent-admissions-list">
+                        <tr>
+                            <td colspan="5" style="text-align:center;">Loading dynamic data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <?php
 }
-
-/** 🛠 Temp Callback Functions to prevent errors */
-function aiac_dashboard_page() { echo '<div class="wrap"><h1>Dashboard</h1><p>Welcome to AI Admission Counselor</p></div>'; }
-function aiac_leads_page() { echo '<div class="wrap"><h1>Leads Manager</h1></div>'; }
-function aiac_admissions_page() { echo '<div class="wrap"><h1>Admissions</h1></div>'; }
-function aiac_payments_page() { echo '<div class="wrap"><h1>Payments & Installments</h1></div>'; }
-function aiac_settings_page() { echo '<div class="wrap"><h1>Settings</h1></div>'; }
-
 // ✅ Syntax verified block end
