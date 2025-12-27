@@ -1,76 +1,82 @@
-/** Part 1 — Global Tokens & Dashboard Layout */
+/** Part 1 — Forced Specificity for WordPress Admin */
+
+/* Root Variables */
 :root {
     --aiac-primary: #2563eb;
-    --aiac-secondary: #64748b;
-    --aiac-bg: #f8fafc;
     --aiac-card-bg: #ffffff;
     --aiac-text: #1e293b;
     --aiac-border: #e2e8f0;
 }
 
-/* Dark Mode Tokens */
-body.aiac-dark-mode {
-    --aiac-bg: #0f172a;
-    --aiac-card-bg: #1e293b;
-    --aiac-text: #f1f5f9;
-    --aiac-border: #334155;
-}
-
-.aiac-wrap {
+/* Container */
+#wpbody .aiac-wrap {
     padding: 20px;
-    background: var(--aiac-bg);
-    color: var(--aiac-text);
+    background: #f0f2f5 !important;
     min-height: 100vh;
+    margin-left: -20px; /* Adjusting for WP padding */
 }
 
-.aiac-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.aiac-stats-grid {
+/* Stats Cards */
+#wpbody .aiac-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    margin-bottom: 30px;
+    margin: 20px 0;
 }
 
-.aiac-card {
-    background: var(--aiac-card-bg);
-    padding: 24px;
-    border-radius: 12px;
-    border: 1px solid var(--aiac-border);
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+#wpbody .aiac-card {
+    background: var(--aiac-card-bg) !important;
+    padding: 20px !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--aiac-border) !important;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1) !important;
 }
 
-.aiac-stat-value {
-    font-size: 2rem;
-    font-weight: 700;
+#wpbody .aiac-stat-value {
+    font-size: 28px !important;
+    font-weight: bold !important;
+    color: var(--aiac-primary) !important;
+    display: block;
     margin: 10px 0;
 }
 
-.aiac-btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    border: none;
+/* Buttons */
+#wpbody .aiac-btn {
+    padding: 8px 16px !important;
+    border-radius: 6px !important;
+    text-decoration: none !important;
+    display: inline-block;
+    border: none !important;
 }
 
-.aiac-btn-primary { background: var(--aiac-primary); color: white; }
-.aiac-btn-secondary { background: var(--aiac-secondary); color: white; }
+#wpbody .aiac-btn-primary { 
+    background: var(--aiac-primary) !important; 
+    color: white !important; 
+}
 
-.aiac-table {
+#wpbody .aiac-btn-secondary { 
+    background: #64748b !important; 
+    color: white !important; 
+}
+
+/* Table Style */
+#wpbody .aiac-table {
     width: 100%;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
     border-collapse: collapse;
-    margin-top: 15px;
 }
 
-.aiac-table th, .aiac-table td {
+#wpbody .aiac-table th {
+    background: #f8fafc;
     padding: 12px;
-    text-align: left;
+    border-bottom: 2px solid var(--aiac-border);
+}
+
+#wpbody .aiac-table td {
+    padding: 12px;
     border-bottom: 1px solid var(--aiac-border);
 }
+
 /* ✅ Syntax verified block end */
