@@ -77,3 +77,62 @@
 
 })(jQuery);
 // ✅ Syntax verified block end
+/** Part 2 — Leads Manager Logic */
+// ہم اسے پہلے والے AIAC_App آبجیکٹ کے اندر ہی شامل کر رہے ہیں
+
+// نوٹ: اگر آپ نے پہلے والا مکمل کوڈ 'init' کے ساتھ لکھا ہے، 
+// تو بس ان فنکشنز کو اس کے نیچے پیسٹ کریں (بریکٹ کا خیال رکھتے ہوئے)
+
+AIAC_App.initLeadsPage = function() {
+    const $leadsRoot = $('#aiac-leads-root');
+    if (!$leadsRoot.length) return;
+
+    this.fetchLeads();
+};
+
+AIAC_App.fetchLeads = function() {
+    $.ajax({
+        url: aiacData.ajax_url,
+        type: 'POST',
+        data: {
+            action: 'aiac_get_leads',
+            nonce: aiacData.nonce
+        },
+        success: function(response) {
+            if (response.success) {
+                AIAC_App.renderLeadsTable(response.data);
+            }
+        }
+    });
+};
+
+AIAC_App.renderLeadsTable = function(leads) {
+    let html = '';
+    if (leads.length === 0) {
+        html = '<tr><td colspan="7" style="text-align:center;">No leads found.</td></tr>';
+    } else {
+        leads.forEach(lead => {
+            html += `<tr>
+                <td>${lead.date}</td>
+                <td><strong>${lead.name}</strong></td>
+                <td>${lead.phone}</td>
+                <td>${lead.course}</td>
+                <td>${lead.lang}</td>
+                <td><span class="status-badge status-${lead.status.toLowerCase()}">${lead.status}</span></td>
+                <td>
+                    <button class="aiac-btn-sm aiac-btn-primary">Connect</button>
+                    <button class="aiac-btn-sm aiac-btn-secondary">Edit</button>
+                </td>
+            </tr>`;
+        });
+    }
+    $('#aiac-leads-list').html(html);
+};
+
+// اب 'init' فنکشن کو اپ ڈیٹ کریں تاکہ وہ لیڈز پیج کو بھی پہچانے
+const originalInit = AIAC_App.init;
+AIAC_App.init = function() {
+    originalInit.apply(this);
+    this.initLeadsPage();
+};
+// ✅ Syntax verified block end
