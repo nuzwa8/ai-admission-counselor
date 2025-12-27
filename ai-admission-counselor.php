@@ -2,7 +2,7 @@
 /*
 Plugin Name: AI Admission Counselor
 Description: A smart AI-based admission guide and finance manager.
-Version: 1.0.0
+Version: 1.0.1
 Author: Architect Mode
 Text Domain: ai-admission-counselor
 */
@@ -61,22 +61,22 @@ function aiac_dashboard_page() {
         <div class="aiac-stats-grid">
             <div class="aiac-card">
                 <h3>Total Leads</h3>
-                <div class="aiac-stat-value" id="stat-total-leads">0</div>
+                <div class="aiac-stat-value" id="stat-total-leads">...</div>
                 <span class="aiac-stat-label">Initial Inquiries</span>
             </div>
             <div class="aiac-card">
                 <h3>Admissions</h3>
-                <div class="aiac-stat-value" id="stat-total-admissions">0</div>
+                <div class="aiac-stat-value" id="stat-total-admissions">...</div>
                 <span class="aiac-stat-label">Confirmed Students</span>
             </div>
             <div class="aiac-card">
                 <h3>Total Revenue</h3>
-                <div class="aiac-stat-value" id="stat-total-revenue">$0</div>
+                <div class="aiac-stat-value" id="stat-total-revenue">$...</div>
                 <span class="aiac-stat-label">Collected Fees</span>
             </div>
             <div class="aiac-card">
                 <h3>Pending Balance</h3>
-                <div class="aiac-stat-value" id="stat-pending-balance" style="color: #e74c3c;">$0</div>
+                <div class="aiac-stat-value" id="stat-pending-balance" style="color: #e74c3c;">$...</div>
                 <span class="aiac-stat-label">Next Due: <strong id="next-due-date">N/A</strong></span>
             </div>
         </div>
@@ -98,7 +98,7 @@ function aiac_dashboard_page() {
                         </tr>
                     </thead>
                     <tbody id="aiac-recent-admissions-list">
-                        <tr><td colspan="5" style="text-align:center;">Loading dynamic data...</td></tr>
+                        <tr><td colspan="5" style="text-align:center;">Initialising system...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -107,15 +107,14 @@ function aiac_dashboard_page() {
     <?php
 }
 
-/** 5. Empty Temp Functions for Other Pages */
-/** Part 7 — Leads Manager Page Template */
+/** 5. Leads Manager Page Template */
 function aiac_leads_page() {
     ?>
     <div id="aiac-leads-root" class="aiac-wrap">
         <header class="aiac-header">
             <div class="aiac-header-title">
                 <h1>Leads Manager</h1>
-                <p>Track and manage initial student inquiries via AI Counselor.</p>
+                <p>Track and manage student inquiries. <span id="leads-debug-note" style="color:green; font-weight:bold;">(Live Sync Active)</span></p>
             </div>
             <div class="aiac-header-actions">
                 <button class="aiac-btn aiac-btn-primary" id="aiac-add-lead-btn">+ Add New Lead</button>
@@ -137,32 +136,34 @@ function aiac_leads_page() {
                     </tr>
                 </thead>
                 <tbody id="aiac-leads-list">
-                    <tr><td colspan="7" style="text-align:center;">Fetching leads from database...</td></tr>
+                    <tr><td colspan="7" style="text-align:center;">Connecting to AI Data Stream...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
     <?php
 }
-// ✅ Syntax verified block end
-function aiac_admissions_page() { echo '<div class="wrap"><h1>Admissions</h1></div>'; }
-function aiac_payments_page() { echo '<div class="wrap"><h1>Payments</h1></div>'; }
-function aiac_settings_page() { echo '<div class="wrap"><h1>Settings</h1></div>'; }
 
-// ✅ Syntax verified block end
-/** Part 8 — Inline Script for Data Loading (iPad Fix) */
-add_action('admin_footer', 'aiac_force_load_script');
-function aiac_force_load_script() {
+function aiac_admissions_page() { echo '<div class="wrap"><h1>Admissions Manager</h1></div>'; }
+function aiac_payments_page() { echo '<div class="wrap"><h1>Payments & Financials</h1></div>'; }
+function aiac_settings_page() { echo '<div class="wrap"><h1>Plugin Settings</h1></div>'; }
+
+/** 6. Forced Inline Data Loader (iPad Cache-Proof) */
+add_action('admin_footer', 'aiac_force_load_script_fixed');
+function aiac_force_load_script_fixed() {
+    $screen = get_current_screen();
+    // صرف ہمارے پلگ ان کے پیجز پر چلائیں
+    if ( strpos($screen->id, 'ai-admission-counselor') === false && strpos($screen->id, 'aiac-') === false ) return;
     ?>
     <script type="text/javascript">
     jQuery(document).ready(function($) {
-        console.log("AIAC Script Triggered");
-
-        // 1. Dashboard Logic
+        const aiac_nonce = '<?php echo wp_create_nonce("aiac_secure_nonce"); ?>';
+        
+        // --- 1. Dashboard Fetch ---
         if ($('#aiac-dashboard-root').length > 0) {
             $.post(ajaxurl, {
                 action: 'aiac_get_dashboard_stats',
-                nonce: '<?php echo wp_create_nonce("aiac_secure_nonce"); ?>'
+                nonce: aiac_nonce
             }, function(res) {
                 if (res.success) {
                     $('#stat-total-leads').text(res.data.total_leads);
@@ -171,33 +172,47 @@ function aiac_force_load_script() {
                     $('#stat-pending-balance').text('$' + res.data.pending_balance);
                     
                     let rows = '';
-                    res.data.recent_admissions.forEach(item => {
-                        rows += `<tr><td>${item.student_name}</td><td>${item.course_name}</td><td>${item.status}</td><td>$${item.balance}</td><td><button class="aiac-btn-sm">View</button></td></tr>`;
-                    });
+                    if(res.data.recent_admissions.length > 0) {
+                        res.data.recent_admissions.forEach(item => {
+                            rows += `<tr><td>${item.student_name}</td><td>${item.course_name}</td><td>${item.status}</td><td>$${item.balance}</td><td><button class="aiac-btn-sm">View</button></td></tr>`;
+                        });
+                    } else {
+                        rows = '<tr><td colspan="5" style="text-align:center;">No recent admissions found.</td></tr>';
+                    }
                     $('#aiac-recent-admissions-list').html(rows);
                 }
             });
         }
 
-        // 2. Leads Page Logic
+        // --- 2. Leads Manager Fetch ---
         if ($('#aiac-leads-root').length > 0) {
             $.post(ajaxurl, {
                 action: 'aiac_get_leads',
-                nonce: '<?php echo wp_create_nonce("aiac_secure_nonce"); ?>'
+                nonce: aiac_nonce
             }, function(res) {
                 if (res.success) {
                     let html = '';
-                    res.data.forEach(lead => {
-                        html += `<tr>
-                            <td>${lead.date || lead.created_at}</td>
-                            <td><strong>${lead.name || lead.student_name}</strong></td>
-                            <td>${lead.phone || lead.phone_number}</td>
-                            <td>${lead.course || lead.course_id}</td>
-                            <td>${lead.lang || lead.language_detected}</td>
-                            <td><span class="status-badge status-new">${lead.status}</span></td>
-                            <td><button class="aiac-btn-sm aiac-btn-primary">View</button></td>
-                        </tr>`;
-                    });
+                    if(res.data.length > 0) {
+                        res.data.forEach(lead => {
+                            let name = lead.student_name || lead.name;
+                            let date = lead.created_at || lead.date;
+                            let phone = lead.phone_number || lead.phone;
+                            let course = lead.course_id || lead.course;
+                            let lang = lead.language_detected || lead.lang;
+                            
+                            html += `<tr>
+                                <td>${date}</td>
+                                <td><strong>${name}</strong></td>
+                                <td>${phone}</td>
+                                <td>${course}</td>
+                                <td>${lang}</td>
+                                <td><span class="status-badge status-new">${lead.status}</span></td>
+                                <td><button class="aiac-btn-sm aiac-btn-primary">Connect</button></td>
+                            </tr>`;
+                        });
+                    } else {
+                        html = '<tr><td colspan="7" style="text-align:center;">No leads found in database.</td></tr>';
+                    }
                     $('#aiac-leads-list').html(html);
                 }
             });
@@ -206,3 +221,4 @@ function aiac_force_load_script() {
     </script>
     <?php
 }
+// ✅ Syntax verified block end
