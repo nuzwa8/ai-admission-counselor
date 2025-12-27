@@ -1,5 +1,4 @@
 <?php
-/** Part 2 — Database Helper Class */
 if (!defined('ABSPATH')) exit;
 
 class AIAC_DB {
@@ -10,14 +9,12 @@ class AIAC_DB {
         $this->wpdb = $wpdb;
     }
 
-    // Get table name with prefix
-    public function get_table($name) {
-        return $this->wpdb->prefix . 'aiac_' . $name;
-    }
-
-    // Insert Lead or Admission
-    public function insert_data($table, $data) {
-        return $this->wpdb->insert($this->get_table($table), $data);
+    public function fetch_all_leads() {
+        $table = $this->wpdb->prefix . 'aiac_leads';
+        // چیک کریں کہ کیا ٹیبل موجود ہے
+        if($this->wpdb->get_var("SHOW TABLES LIKE '$table'") != $table) {
+            return array(); 
+        }
+        return $this->wpdb->get_results("SELECT * FROM $table ORDER BY created_at DESC", ARRAY_A);
     }
 }
-// ✅ Syntax verified block end
