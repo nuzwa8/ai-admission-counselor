@@ -150,3 +150,59 @@ function aiac_payments_page() { echo '<div class="wrap"><h1>Payments</h1></div>'
 function aiac_settings_page() { echo '<div class="wrap"><h1>Settings</h1></div>'; }
 
 // ✅ Syntax verified block end
+/** Part 8 — Inline Script for Data Loading (iPad Fix) */
+add_action('admin_footer', 'aiac_force_load_script');
+function aiac_force_load_script() {
+    ?>
+    <script type="text/javascript">
+    jQuery(document).ready(function($) {
+        console.log("AIAC Script Triggered");
+
+        // 1. Dashboard Logic
+        if ($('#aiac-dashboard-root').length > 0) {
+            $.post(ajaxurl, {
+                action: 'aiac_get_dashboard_stats',
+                nonce: '<?php echo wp_create_nonce("aiac_secure_nonce"); ?>'
+            }, function(res) {
+                if (res.success) {
+                    $('#stat-total-leads').text(res.data.total_leads);
+                    $('#stat-total-admissions').text(res.data.total_admissions);
+                    $('#stat-total-revenue').text('$' + res.data.total_revenue);
+                    $('#stat-pending-balance').text('$' + res.data.pending_balance);
+                    
+                    let rows = '';
+                    res.data.recent_admissions.forEach(item => {
+                        rows += `<tr><td>${item.student_name}</td><td>${item.course_name}</td><td>${item.status}</td><td>$${item.balance}</td><td><button class="aiac-btn-sm">View</button></td></tr>`;
+                    });
+                    $('#aiac-recent-admissions-list').html(rows);
+                }
+            });
+        }
+
+        // 2. Leads Page Logic
+        if ($('#aiac-leads-root').length > 0) {
+            $.post(ajaxurl, {
+                action: 'aiac_get_leads',
+                nonce: '<?php echo wp_create_nonce("aiac_secure_nonce"); ?>'
+            }, function(res) {
+                if (res.success) {
+                    let html = '';
+                    res.data.forEach(lead => {
+                        html += `<tr>
+                            <td>${lead.date || lead.created_at}</td>
+                            <td><strong>${lead.name || lead.student_name}</strong></td>
+                            <td>${lead.phone || lead.phone_number}</td>
+                            <td>${lead.course || lead.course_id}</td>
+                            <td>${lead.lang || lead.language_detected}</td>
+                            <td><span class="status-badge status-new">${lead.status}</span></td>
+                            <td><button class="aiac-btn-sm aiac-btn-primary">View</button></td>
+                        </tr>`;
+                    });
+                    $('#aiac-leads-list').html(html);
+                }
+            });
+        }
+    });
+    </script>
+    <?php
+}
