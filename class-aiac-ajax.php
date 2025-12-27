@@ -30,7 +30,7 @@ class AIAC_AJAX {
 
     /** 2. Get Leads for Leads Manager */
     public function get_leads() {
-        check_ajax_referer('aiac_secure_nonce', 'nonce');
+        //check_ajax_referer('aiac_secure_nonce', 'nonce');//
         
         // پہلے ڈیٹا بیس سے ڈیٹا لانے کی کوشش کریں
         $db = new AIAC_DB();
