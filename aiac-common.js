@@ -136,3 +136,33 @@ AIAC_App.init = function() {
     this.initLeadsPage();
 };
 // ✅ Syntax verified block end
+/** Part 2 — Leads Page AJAX Loader */
+$(document).ready(function() {
+    if ($('#aiac-leads-root').length > 0) {
+        fetchLeadsList();
+    }
+
+    function fetchLeadsList() {
+        $.post(aiacData.ajax_url, {
+            action: 'aiac_get_leads',
+            nonce: aiacData.nonce
+        }, function(response) {
+            if (response.success) {
+                let html = '';
+                response.data.forEach(function(lead) {
+                    html += `<tr>
+                        <td>${lead.created_at || lead.date}</td>
+                        <td><strong>${lead.student_name || lead.name}</strong></td>
+                        <td>${lead.phone_number || lead.phone}</td>
+                        <td>${lead.course_id || 'AI Mastery'}</td>
+                        <td>${lead.language_detected || 'Urdu'}</td>
+                        <td><span class="status-badge status-new">${lead.status}</span></td>
+                        <td><button class="aiac-btn-sm aiac-btn-primary">View</button></td>
+                    </tr>`;
+                });
+                $('#aiac-leads-list').html(html);
+            }
+        });
+    }
+});
+// ✅ Syntax verified block end
