@@ -1,5 +1,5 @@
 <?php
-/** Part 3 — Assets Loader */
+/** Part 3 — Assets Loader (Improved) */
 if (!defined('ABSPATH')) exit;
 
 class AIAC_Assets {
@@ -8,13 +8,16 @@ class AIAC_Assets {
     }
 
     public function enqueue_admin_assets($hook) {
-        // Only load on our plugin pages
-        if (strpos($hook, 'ai-admission-counselor') === false) return;
+        // صرف ہمارے پلگ ان کے پیجز پر لوڈ کریں
+        if (strpos($hook, 'ai-admission-counselor') === false && strpos($hook, 'aiac-') === false) return;
 
-        wp_enqueue_style('aiac-common-css', AIAC_URL . 'aiac-common.css', array(), '1.0.0');
-        wp_enqueue_script('aiac-common-js', AIAC_URL . 'aiac-common.js', array('jquery'), '1.0.0', true);
+        // CSS لوڈ کریں
+        wp_enqueue_style('aiac-common-css', AIAC_URL . 'aiac-common.css', array(), time());
 
-        // Localize data for AJAX
+        // JS لوڈ کریں
+        wp_enqueue_script('aiac-common-js', AIAC_URL . 'aiac-common.js', array('jquery'), time(), true);
+
+        // ڈیٹا پاس کریں (AJAX کے لیے)
         wp_localize_script('aiac-common-js', 'aiacData', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce'    => wp_create_nonce('aiac_secure_nonce')
