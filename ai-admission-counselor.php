@@ -14,13 +14,13 @@ define('AIAC_PATH', plugin_dir_path(__FILE__));
 define('AIAC_URL', plugin_dir_url(__FILE__));
 
 // 1. Activation Hook
-require_once AIAC_PATH . 'class-aiac-activator.php';
+require_once AIAC_PATH . 'includes/class-aiac-activator.php';
 register_activation_hook(__FILE__, array('AIAC_Activator', 'activate'));
 
 // 2. Load Core Files
-require_once AIAC_PATH . 'class-aiac-assets.php';
-require_once AIAC_PATH . 'class-aiac-ajax.php';
-require_once AIAC_PATH . 'class-aiac-db.php';
+require_once AIAC_PATH . 'includes/class-aiac-assets.php';
+require_once AIAC_PATH . 'includes/class-aiac-ajax.php';
+require_once AIAC_PATH . 'includes/class-aiac-db.php';
 
 // 3. Admin Menu Setup
 add_action('admin_menu', 'aiac_create_admin_menu');
@@ -78,6 +78,70 @@ function aiac_dashboard_page() {
                 <h3>Pending Balance</h3>
                 <div class="aiac-stat-value" id="stat-pending-balance" style="color: #e74c3c;">$0</div>
                 <span class="aiac-stat-label">Next Due: <strong id="next-due-date">N/A</strong></span>
+            </div>
+        </div>
+
+        <!-- New Admission Form -->
+        <div class="aiac-content-section">
+            <div class="aiac-card aiac-form-card">
+                <div class="card-header">
+                    <h2>New Admission Form</h2>
+                    <p>Quickly add an admission record (file upload supported).</p>
+                </div>
+
+                <form id="aiac-new-admission-form" enctype="multipart/form-data" method="post" class="aiac-form">
+                    <input type="hidden" name="nonce" value="<?php echo esc_attr(wp_create_nonce('aiac_secure_nonce')); ?>">
+
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+                        <div>
+                            <label>Student Name</label><br>
+                            <input type="text" name="student_name" required style="width:100%;padding:8px;border-radius:4px;">
+                        </div>
+
+                        <div>
+                            <label>Phone Number</label><br>
+                            <input type="text" name="phone_number" required style="width:100%;padding:8px;border-radius:4px;">
+                        </div>
+
+                        <div>
+                            <label>Course</label><br>
+                            <input type="text" name="course_id" placeholder="e.g. AI Mastery" required style="width:100%;padding:8px;border-radius:4px;">
+                        </div>
+
+                        <div>
+                            <label>Total Fee</label><br>
+                            <input type="number" name="total_fee" step="0.01" required style="width:100%;padding:8px;border-radius:4px;">
+                        </div>
+
+                        <div>
+                            <label>Paid Amount</label><br>
+                            <input type="number" name="paid_amount" step="0.01" value="0" style="width:100%;padding:8px;border-radius:4px;">
+                        </div>
+
+                        <div>
+                            <label>Due Date</label><br>
+                            <input type="date" name="due_date" style="width:100%;padding:8px;border-radius:4px;">
+                        </div>
+
+                        <div>
+                            <label>Language</label><br>
+                            <select name="language_detected" style="width:100%;padding:8px;border-radius:4px;">
+                                <option value="en">English</option>
+                                <option value="ur">Urdu</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Payment Screenshot (optional)</label><br>
+                            <input type="file" name="payment_screenshot" accept="image/*" style="width:100%;padding:8px;border-radius:4px;">
+                        </div>
+                    </div>
+
+                    <div style="margin-top:12px;">
+                        <button class="aiac-btn aiac-btn-primary" type="submit">Create Admission</button>
+                        <span style="margin-left:10px;color:#6b7280;font-size:13px;">Records are saved to the plugin admissions table.</span>
+                    </div>
+                </form>
             </div>
         </div>
 
