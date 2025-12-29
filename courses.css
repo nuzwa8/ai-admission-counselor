@@ -1,0 +1,54 @@
+/**
+ * Courses Manager CSS
+ * @package AI_Admission_Counselor
+ */
+
+/* Courses specific styles */
+#wpbody .aiac-courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+#wpbody .aiac-course-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--aiac-border);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#wpbody .aiac-course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+#wpbody .aiac-course-card h3 {
+    margin: 0 0 10px 0;
+    color: var(--aiac-text);
+    font-size: 18px;
+}
+
+#wpbody .aiac-course-card .aiac-course-meta {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+#wpbody .aiac-course-card .aiac-course-fee {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--aiac-primary);
+    margin-bottom: 15px;
+}
+
+#wpbody .aiac-course-card .aiac-course-actions {
+    display: flex;
+    gap: 10px;
+}
+
+#wpbody .aiac-course-card .aiac-course-actions .aiac-btn {
+    flex: 1;
+    text-align: center;
+}
