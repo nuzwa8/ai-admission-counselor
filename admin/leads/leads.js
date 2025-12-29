@@ -88,17 +88,38 @@
         },
 
         renderLeads: function(leads) {
+            var self = this;
             var html = '';
             if (!leads || leads.length === 0) {
                 html = '<tr><td colspan="7" class="aiac-empty">No leads found</td></tr>';
             } else {
+                // First, load courses to map IDs to names
+                $.ajax({
+                    url: aiacData.ajax_url,
+                    type: 'POST',
+                    async: false,
+                    data: {
+                        action: 'aiac_get_courses',
+                        nonce: aiacData.nonce
+                    },
+                    success: function(res) {
+                        self.coursesMap = {};
+                        if (res.success && res.data) {
+                            res.data.forEach(function(course) {
+                                self.coursesMap[course.id] = course.course_name;
+                            });
+                        }
+                    }
+                });
+
                 leads.forEach(function(lead) {
                     var statusClass = 'status-' + (lead.status || 'new').toLowerCase();
+                    var courseName = self.coursesMap[lead.course_id] || lead.course_id || '-';
                     html += '<tr data-id="' + lead.id + '">' +
                         '<td>' + (lead.created_at || lead.date || '-') + '</td>' +
                         '<td><strong>' + (lead.student_name || '-') + '</strong></td>' +
                         '<td>' + (lead.phone_number || '-') + '</td>' +
-                        '<td>' + (lead.course_id || '-') + '</td>' +
+                        '<td>' + courseName + '</td>' +
                         '<td>' + (lead.language_detected || '-') + '</td>' +
                         '<td><span class="status-badge ' + statusClass + '">' + (lead.status || 'New') + '</span></td>' +
                         '<td class="aiac-actions">' +

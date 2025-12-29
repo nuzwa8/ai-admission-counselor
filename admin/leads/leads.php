@@ -79,7 +79,18 @@ function aiac_leads_page_new() {
                     </div>
                     <div class="aiac-form-group">
                         <label for="aiac-lead-course">Interested Course</label>
-                        <input type="text" id="aiac-lead-course" name="course_id" placeholder="e.g., Web Development">
+                        <select id="aiac-lead-course" name="course_id">
+                            <option value="">-- Select Course --</option>
+                            <?php
+                            $db = new AIAC_DB();
+                            $courses = $db->fetch_all_courses(true);
+                            if (!empty($courses)) {
+                                foreach ($courses as $course) {
+                                    echo '<option value="' . esc_attr($course['id']) . '">' . esc_html($course['course_name']) . '</option>';
+                                }
+                            }
+                            ?>
+                        </select>
                     </div>
                 </div>
                 
