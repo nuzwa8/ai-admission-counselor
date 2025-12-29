@@ -62,6 +62,7 @@ function aiac_admissions_page_new() {
                         <th>ID</th>
                         <th>Student</th>
                         <th>Phone</th>
+                        <th>Course</th>
                         <th>Total Fee</th>
                         <th>Paid</th>
                         <th>Balance</th>
@@ -71,7 +72,7 @@ function aiac_admissions_page_new() {
                     </tr>
                 </thead>
                 <tbody id="aiac-admissions-list">
-                    <tr><td colspan="9" class="aiac-loading">Loading...</td></tr>
+                    <tr><td colspan="10" class="aiac-loading">Loading...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -91,6 +92,23 @@ function aiac_admissions_page_new() {
                     <label for="aiac-admission-lead">Select Lead *</label>
                     <select id="aiac-admission-lead" name="lead_id" required>
                         <option value="">-- Select Lead --</option>
+                    </select>
+                </div>
+                
+                <div class="aiac-form-group">
+                    <label for="aiac-admission-course">Select Course *</label>
+                    <select id="aiac-admission-course" name="course_id" required>
+                        <option value="">-- Select Course --</option>
+                        <?php
+                        // Courses will be loaded via AJAX, but we can also show default options
+                        $db = new AIAC_DB();
+                        $courses = $db->fetch_all_courses(true);
+                        if (!empty($courses)) {
+                            foreach ($courses as $course) {
+                                echo '<option value="' . esc_attr($course['id']) . '">' . esc_html($course['course_name']) . ' - ' . esc_html($currency) . ' ' . number_format($course['fee']) . '</option>';
+                            }
+                        }
+                        ?>
                     </select>
                 </div>
                 

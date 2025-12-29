@@ -93,7 +93,7 @@
             var search = $('#aiac-admission-search').val();
             var status = $('#aiac-admission-status-filter').val();
 
-            $('#aiac-admissions-list').html('<tr><td colspan="9" class="aiac-loading">Loading...</td></tr>');
+            $('#aiac-admissions-list').html('<tr><td colspan="10" class="aiac-loading">Loading...</td></tr>');
 
             $.post(aiacData.ajax_url, {
                 action: 'aiac_get_admissions',
@@ -108,20 +108,23 @@
         },
 
         renderAdmissions: function(admissions) {
+            var self = this;
             var html = '';
             var currency = aiacData.currency || 'PKR';
             
             if (!admissions || admissions.length === 0) {
-                html = '<tr><td colspan="9" class="aiac-empty">No admissions found</td></tr>';
+                html = '<tr><td colspan="10" class="aiac-empty">No admissions found</td></tr>';
             } else {
                 admissions.forEach(function(adm) {
                     var balance = parseFloat(adm.total_fee) - parseFloat(adm.paid_amount);
                     var statusClass = 'status-' + (adm.admission_status || 'pending');
+                    var courseName = adm.course_name || '-';
                     
                     html += '<tr data-id="' + adm.id + '">' +
                         '<td>#' + adm.id + '</td>' +
                         '<td><strong>' + (adm.student_name || 'N/A') + '</strong></td>' +
                         '<td>' + (adm.phone_number || '-') + '</td>' +
+                        '<td>' + courseName + '</td>' +
                         '<td>' + currency + ' ' + parseFloat(adm.total_fee).toLocaleString() + '</td>' +
                         '<td>' + currency + ' ' + parseFloat(adm.paid_amount).toLocaleString() + '</td>' +
                         '<td class="' + (balance > 0 ? 'aiac-danger' : 'aiac-success') + '">' + currency + ' ' + balance.toLocaleString() + '</td>' +
@@ -152,14 +155,31 @@
                     var opts = '<option value="">-- Select Lead --</option>';
                     res.data.forEach(function(lead) {
                         var selected = admission && admission.lead_id == lead.id ? 'selected' : '';
-                        opts += '<option value="' + lead.id + '" ' + selected + '>' + lead.student_name + ' (' + lead.phone_number + ')</option>';
+                        opts += '<option value="' + lead.id + '" ' + selected + '>' + (lead.student_name || lead.name) + ' (' + (lead.phone_number || lead.phone) + ')</option>';
                     });
                     $('#aiac-admission-lead').html(opts);
                 }
             });
 
+            // Load courses dropdown
+            $.post(aiacData.ajax_url, {
+                action: 'aiac_get_courses',
+                nonce: aiacData.nonce
+            }, function(res) {
+                if (res.success) {
+                    var opts = '<option value="">-- Select Course --</option>';
+                    var currency = aiacData.currency || 'PKR';
+                    res.data.forEach(function(course) {
+                        var selected = admission && admission.course_id == course.id ? 'selected' : '';
+                        opts += '<option value="' + course.id + '" ' + selected + '>' + course.course_name + ' - ' + currency + ' ' + parseFloat(course.fee).toLocaleString() + '</option>';
+                    });
+                    $('#aiac-admission-course').html(opts);
+                }
+            });
+
             if (admission) {
                 $('#aiac-admission-id').val(admission.id);
+                $('#aiac-admission-course').val(admission.course_id);
                 $('#aiac-admission-fee').val(admission.total_fee);
                 $('#aiac-admission-paid').val(admission.paid_amount);
                 $('#aiac-admission-due').val(admission.due_date);
@@ -193,6 +213,7 @@
                 nonce: aiacData.nonce,
                 admission_id: $('#aiac-admission-id').val(),
                 lead_id: $('#aiac-admission-lead').val(),
+                course_id: $('#aiac-admission-course').val(),
                 total_fee: $('#aiac-admission-fee').val(),
                 paid_amount: $('#aiac-admission-paid').val(),
                 due_date: $('#aiac-admission-due').val(),
