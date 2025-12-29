@@ -1,5 +1,5 @@
 /** * AI Admission Counselor - Common JS 
- * Version: 1.2 (Form submit for New Admission)
+ * Version: 1.1 (Fixed for iPad Compatibility)
  */
 (function($) {
     'use strict';
@@ -21,40 +21,6 @@
                         location.reload();
                     });
                 }
-            });
-
-            // New admission form submit (uses FormData for file upload)
-            $(document).on('submit', '#aiac-new-admission-form', function(e) {
-                e.preventDefault();
-                var form = this;
-                var fd = new FormData(form);
-                // Add action and nonce if not included
-                fd.set('action', 'aiac_add_admission');
-                if (!fd.get('nonce') && window.aiacData && aiacData.nonce) {
-                    fd.set('nonce', aiacData.nonce);
-                }
-
-                $.ajax({
-                    url: aiacData.ajax_url,
-                    type: 'POST',
-                    data: fd,
-                    processData: false,
-                    contentType: false,
-                    success: function(res) {
-                        if (res && res.success) {
-                            alert(res.data && res.data.message ? res.data.message : 'Admission created');
-                            // reload to reflect new data
-                            location.reload();
-                        } else {
-                            var msg = (res && res.data && res.data.message) ? res.data.message : 'Error creating admission';
-                            alert(msg);
-                        }
-                    },
-                    error: function(xhr, status, err) {
-                        console.error('AIAC form submit error', status, err);
-                        alert('Request failed: ' + status);
-                    }
-                });
             });
         },
 
@@ -121,7 +87,7 @@
             $.post(aiacData.ajax_url, data, function(response) {
                 if (response.success && callback) {
                     callback(response.data);
-                } else if (!response.success) {
+                } else {
                     console.error('AIAC Error:', response);
                 }
             });
